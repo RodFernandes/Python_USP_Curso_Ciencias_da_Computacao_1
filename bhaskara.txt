@@ -1,0 +1,9 @@
+***** [0.1 pontos]: Testando Báskara sem raízes reais - formato da resposta (a = 5, b = 3, c = 5) - Falhou *****
+AssertionError: Sua resposta está correta, mas não segue o formato pedido; verifique problemas com pontuação, espaços duplos ou erros de ortografia. A resposta obtida foi
+
+
+***** [0.3 pontos]: Testando Báskara com uma raiz real (a = 9, b = -12, c = 4) - Falhou *****
+AssertionError: ('Esta equação tem exatamente uma raiz, mas a resposta recebida foi\n%s', '')
+
+***** [0.4 pontos]: Testando Báskara com 2 raízes reais (a = 1, b = -3, c = -10) - Falhou *****
+AssertionError: ('Esta equação tem duas raízes, mas a resposta recebida foi\n%s', '')

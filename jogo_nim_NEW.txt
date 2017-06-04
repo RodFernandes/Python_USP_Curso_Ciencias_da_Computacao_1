@@ -1,0 +1,4 @@
+O resultado dos testes com seu programa foi:
+
+***** [0.12 pontos]: Checando campeonato (partida 1: n = 5, m = 3, jogadas = [1]; partida 2: n = 5, m = 3, jogadas = [2]; partida 3: n = 9, m = 2, jogadas = [1, 2, 2]) - Falhou *****
+AssertionError: Placar incorreto
