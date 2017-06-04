@@ -29,14 +29,22 @@ fi,b é o valor de cada traço linguístico i no texto b.
 Perceba que quanto mais similares a e b forem, menor Sab será. Para cada texto, você deve calcular o grau de similaridade com a assinatura do portador de COH-PIAH 
 e no final exibir qual o texto que mais provavelmente foi escrito por algum aluno infectado.
 
+
+def main():
+    assinatura = le_assinatura()
+    texto = le_textos()
+    matriz_ass = calcula_assinatura(texto)
+    assinatura = compara_assinatura(assinatura, matriz_ass)
+    copiah = avalia_textos(texto, assinatura) + 1
+    return print("O autor do texto", copiah, "está infectado com COH-PIAH.")
 '''
 
 import re
+import math
+
 
 def le_assinatura():
-    '''A funcao le os valores dos tracos linguisticos do modelo e devolve uma assinatura a ser comparada com os textos fornecidos'''
     print("Bem-vindo ao detector automático de COH-PIAH.")
-
     wal = float(input("Entre o tamanho medio de palavra:"))
     ttr = float(input("Entre a relação Type-Token:"))
     hlr = float(input("Entre a Razão Hapax Legomana:"))
@@ -46,16 +54,18 @@ def le_assinatura():
 
     return [wal, ttr, hlr, sal, sac, pal]
 
+
 def le_textos():
     i = 1
     textos = []
-    texto = input("Digite o texto " + str(i) +" (aperte enter para sair):")
+    texto = input("Digite o texto " + str(i) + " (aperte enter para sair):")
     while texto:
         textos.append(texto)
         i += 1
-        texto = input("Digite o texto " + str(i) +" (aperte enter para sair):")
+        texto = input("Digite o texto " + str(i) + " (aperte enter para sair):")
 
     return textos
+
 
 def separa_sentencas(texto):
     '''A funcao recebe um texto e devolve uma lista das sentencas dentro do texto'''
@@ -64,13 +74,16 @@ def separa_sentencas(texto):
         del sentencas[-1]
     return sentencas
 
+
 def separa_frases(sentenca):
     '''A funcao recebe uma sentenca e devolve uma lista das frases dentro da sentenca'''
     return re.split(r'[,:;]+', sentenca)
 
+
 def separa_palavras(frase):
     '''A funcao recebe uma frase e devolve uma lista das palavras dentro da frase'''
     return frase.split()
+
 
 def n_palavras_unicas(lista_palavras):
     '''Essa funcao recebe uma lista de palavras e devolve o numero de palavras que aparecem uma unica vez'''
@@ -88,6 +101,7 @@ def n_palavras_unicas(lista_palavras):
 
     return unicas
 
+
 def n_palavras_diferentes(lista_palavras):
     '''Essa funcao recebe uma lista de palavras e devolve o numero de palavras diferentes utilizadas'''
     freq = dict()
@@ -100,189 +114,168 @@ def n_palavras_diferentes(lista_palavras):
 
     return len(freq)
 
-def tam_medio_pal(soma_comp_palavras, num_tot_palavras):
-    if num_tot_palavras != 0:
-        tam_m_pal = soma_comp_palavras / num_tot_palavras
-    else:
-        tam_m_pal = 0
-    return tam_m_pal
+
+def calcula_tamanho_medio_palavra(palavras):
+    total_palavras = len(palavras)
+    somatorio = 0
+    for i in range(len(palavras)):
+        somatorio = somatorio + len(palavras[i])
+    return somatorio / total_palavras
 
 
-def type_token(lista_palavras, num_tot_palavras):
-    num_pal_dif = n_palavras_diferentes(lista_palavras)
-    if num_tot_palavras != 0:
-        type_token = num_pal_dif / num_tot_palavras
-    else:
-        type_token = 0
-    return type_token
+def calcula_relacao_type_token(palavras):
+    total_palavras = len(palavras)
+    num_palavras_diferentes = n_palavras_diferentes(palavras)
+    return num_palavras_diferentes / total_palavras
 
 
-def hapax_lego(lista_palavras, num_tot_palavras):
-    num_pal_uni = n_palavras_unicas(lista_palavras)
-    if num_tot_palavras != 0:
-        h_lego = num_pal_uni / num_tot_palavras
-    else:
-        h_lego = 0
-    return h_lego
+def calcula_razao_hapax_legomana(palavras):
+    total_palavras = len(palavras)
+    num_palavras_diferentes = n_palavras_unicas(palavras)
+    return num_palavras_diferentes / total_palavras
 
 
-def tam_medio_sent(soma_num_cat, num_sent):
-    if num_sent != 0:
-        tam_m_sent = soma_num_cat / num_sent
-    else:
-        tam_m_sent = 0
-    return tam_m_sent
+def total_caracteres_delimitadores_fora_sentences(palavras):
+    caracteres = ['.', '!', '?']
+    total_caracteres = 0;
+    print("total_caracteres_delimitadores_fora_sentences:", palavras)
+    for i in range(len(palavras)):
+        #if palavras[i].find('.') >= 0 or palavras[i].find("!") >= 0 or palavras[i].find("?") >= 0:
+        if palavras[i].find('.') >= 0 or palavras[i].find("!") >= 0 or palavras[i].find("?") >= 0:
+            total_caracteres = total_caracteres + 1
+    print("total_caracteres: ", total_caracteres)
+    return total_caracteres
 
 
-def compx_med(num_tot_frases, num_tot_sentencas):
-    if num_tot_sentencas != 0:
-        compx_med = num_tot_frases / num_tot_sentencas
-    else:
-        compx_med = 0
-    return compx_med
+def calcula_tamanho_medio_sentencas(sentencas, palavras):
+    total_sentencas = len(sentencas)
+    #print("total_sentencas: ", total_sentencas)
+    #print("palavras: ", palavras)
+    #return total_caracteres_delimitadores_fora_sentences(palavras) / total_sentencas
+    return len(palavras) / total_sentencas
 
 
-def tam_medio_frase(soma_cat_frases, num_tot_frases):
-    if num_tot_frases != 0:
-        tam_m_frase = soma_cat_frases / num_tot_frases
-    else:
-        tam_m_frase = 0
-    return tam_m_frase
+def calcula_complexidade_sentencas(sentencas, frases):
+    total_sentencas = len(sentencas)
+    total_frases = len(frases)
+    return total_frases / total_sentencas
+
+
+def total_caracteres_delimitadores_fora_frases(palavras):
+    total_caracteres = 0;
+    for i in range(len(palavras)):
+        for j in range(len(palavras[i])):
+            if palavras[i].find(',') >= 0 or palavras[i].find(":") >= 0 or palavras[i].find(";") >= 0:
+                total_caracteres = total_caracteres + 1
+    return total_caracteres
+
+
+def calcula_tamanho_medio_frases(frases, palavras):
+    total_frases = len(frases)
+    return total_caracteres_delimitadores_fora_frases(palavras) / total_frases
+
 
 def compara_assinatura(as_a, as_b):
-    '''IMPLEMENTAR. Essa funcao recebe duas assinaturas de texto e deve devolver o grau de similaridade nas assinaturas.'''
-    lista_Sab = []
-    soma_mod = 0
-    if type(as_b[0]) is list:
-        for lin in range(len(as_b)):
-            for col in range(len(as_b[lin])):
-                soma_mod += abs(as_a[col] - as_b[lin][col])
-            Sab = soma_mod / 6
-            lista_Sab.append(Sab)
-        return lista_Sab
-    else:
-        for i in range(len(as_b)):
-            soma_mod += abs(as_a[i] - as_b[i])
-        Sab = soma_mod / 6
-        return Sab
+    sum = 0
+    for i in range(6):
+        #a = as_a[i]
+        #b = as_b[i]
+        #sum = sum + math.fabs(a - b)
+        sum = sum + math.fabs(as_a[i] - as_b[i])
+
+    return sum / 6
+
 
 def calcula_assinatura(texto):
-    '''IMPLEMENTAR. Essa funcao recebe um texto e deve devolver a assinatura do texto.'''
+    sentencas = separa_sentencas(texto)
+    frases = []
+    palavras = []
+    for i in range(len(sentencas)):
+        temp_frases = separa_frases(sentencas[i])
+        for j in range(len(temp_frases)):
+            frases.append(temp_frases[j])
 
-    matriz_ass_input = []
-    for i in texto:
-        sentencas = []
-        sentencas = separa_sentencas(str(i))
-        frases = []
-        num_tot_sentencas = 0
-        soma_cat_sentencas = 0
-        for i in range(len(sentencas)):
-            frase_i = separa_frases(str(sentencas[i]))
-            frases.append(frase_i)
-            num_tot_sentencas += 1
-            soma_cat_sentencas = soma_cat_sentencas + len(sentencas[i])
-        palavras = []
-        num_tot_frases = 0
-        soma_cat_frases = 0
-        for lin in range(len(frases)):
-            for col in range(len(frases[lin])):
-                palavra_i = separa_palavras(str(frases[lin][col]))
-                palavras.append(palavra_i)
-                num_tot_frases += 1
-                soma_cat_frases = soma_cat_frases + len(str(frases[lin][col]))
-        mtrx_para_lista = []
-        for lin in range(len(palavras)):
-            for col in range(len(palavras[lin])):
-                mtrx_para_lista.append(palavras[lin][col])
-        palavras = mtrx_para_lista[:]
-        soma_comp_palavras = 0
-        num_tot_palavras = 0
-        for lin in range(len(palavras)):
-            for col in range(len(palavras[lin])):
-                soma_comp_palavras = soma_comp_palavras + len(str(palavras[lin][col]))
-            num_tot_palavras += 1
-        ass_txt = []
-        ass_txt.append(tam_medio_pal(soma_comp_palavras, num_tot_palavras))
-        ass_txt.append(type_token(palavras, num_tot_palavras))
-        ass_txt.append(hapax_lego(palavras, num_tot_palavras))
-        ass_txt.append(tam_medio_sent(soma_cat_sentencas, num_tot_sentencas))
-        ass_txt.append(compx_med(num_tot_frases, num_tot_sentencas))
-        ass_txt.append(tam_medio_frase(soma_cat_frases, num_tot_frases))
-        matriz_ass_input.append(ass_txt)
-    return matriz_ass_input
+    for i in range(len(frases)):
+        temp_palavras = separa_palavras(frases[i])
+        for j in range(len(temp_palavras)):
+            palavras.append(temp_palavras[j])
+
+    # Tamanho médio de palavra - wal
+    wal = calcula_tamanho_medio_palavra(palavras)
+    #print("calculated Tamanho médio de palavra: ", wal)
+    # Relação Type-Token - ttr
+    ttr = calcula_relacao_type_token(palavras)
+    #print("calculated Relação Type-Token: ", ttr)
+    # Razão Hapax Legomana - hlr
+    hlr = calcula_razao_hapax_legomana(palavras)
+    #print(" calculated Razão Hapax Legomana - hlr: ", hlr)
+    # Tamanho médio de sentença - sal
+    sal = calcula_tamanho_medio_sentencas(sentencas, palavras)
+    #print("sentencas: ", sentencas)
+    print("calculated Tamanho médio de sentença: ", sal)
+    # Complexidade de sentença -  sac
+    sac = calcula_complexidade_sentencas(sentencas, frases)
+    #print("calculated Complexidade de sentença: ", sac)
+    # Tamanho médio de frases - pal
+    pal = calcula_tamanho_medio_frases(frases, palavras)
+    #print("calculated Tamanho médio de frases: ", pal)
+
+    return [wal, ttr, hlr, sal, sac, pal]
+
+
+def reconhece_autor_infectado(array):
+    min = array[0]
+    i = 1
+    pos = 0
+    while i < len(array):
+        if array[i] < min:
+            min = array[i]
+            pos = i
+        i = i + 1
+    return pos
 
 
 def avalia_textos(textos, ass_cp):
-    '''IMPLEMENTAR. Essa funcao recebe uma lista de textos e deve devolver o numero (1 a n) do texto com maior probabilidade de ter sido infectado por COH-PIAH.'''
-    aux_ass_com = (ass_cp[:])
-    aux_ass_com.sort()
-    for indice in range(len(ass_cp)):
-        if aux_ass_com[0] == ass_cp[indice]:
-            copiah = indice
-    return copiah - 1
+    array_grau_similiaridades_textos = []
+    for i in range(len(textos)):
+        ass_text = calcula_assinatura(textos[i])
+        grau_similaridade = compara_assinatura(ass_cp, ass_text)
+        array_grau_similiaridades_textos.append(grau_similaridade)
+        print("calculate grau similariadade", array_grau_similiaridades_textos)
 
-def main_teste():
-    lista_texto = []
-    lista_sentencas = []
-    lista_frases = []
-    lista_palavras = []
-    lista_assinatura = []
-    lista_pal_unicas = 0
-    lista_pal_diferentes = []
+    return reconhece_autor_infectado(array_grau_similiaridades_textos)
 
-    f = 0
-    p = 0
 
-    #lista_assinatura = le_assinatura()
+def loadTexts():
+    texts = []
+    temp = "Navegadores antigos tinham uma frase gloriosa:\"Navegar é preciso; viver não é preciso\". Quero para mim o espírito [d]esta frase, transformada a forma para a casar como eu sou: Viver não é necessário; o que é necessário é criar. Não conto gozar a minha vida; nem em gozá-la penso. Só quero torná-la grande,ainda que para isso tenha de ser o meu corpo e a (minha alma) a lenha desse fogo. Só quero torná-la de toda a humanidade;ainda que para isso tenha de a perder como minha. Cada vez mais assim penso.Cada vez mais ponho da essência anímica do meu sangueo propósito impessoal de engrandecer a pátria e contribuirpara a evolução da humanidade.É a forma que em mim tomou o misticismo da nossa Raça."
+    texts.append(temp)
+    temp = "Voltei-me para ela; Capitu tinha os olhos no chão. Ergueu-os logo, devagar, e ficamos a olhar um para o outro... Confissão de crianças, tu valias bem duas ou três páginas, mas quero ser poupado. Em verdade, não falamos nada; o muro falou por nós. Não nos movemos, as mãos é que se estenderam pouco a pouco, todas quatro, pegando-se, apertando-se, fundindo-se. Não marquei a hora exata daquele gesto. Devia tê-la marcado; sinto a falta de uma nota escrita naquela mesma noite, e que eu poria aqui com os erros de ortografia que trouxesse, mas não traria nenhum, tal era a diferença entre o estudante e o adolescente. Conhecia as regras do escrever, sem suspeitar as do amar; tinha orgias de latim e era virgem de mulheres."
+    texts.append(temp)
+    temp = "NOSSA alegria diante dum sistema metafisico, nossa satisfação em presença duma construção do pensamento, em que a organização espiritual do mundo se mostra num conjunto lógico, coerente a harmônico, sempre dependem eminentemente da estética; têm a mesma origem que o prazer, que a alta satisfação, sempre serena afinal, que a atividade artística nos proporciona quando cria a ordem e a forma a nos permite abranger com a vista o caos da vida, dando-lhe transparência."
+    texts.append(temp)
+    return texts
+
+
+def loadAssinaturas():
+    return [4.79, 0.72, 0.56, 80.5, 2.5, 31.6]
+
+
+def main():
+    texts = loadTexts()
+    print("load texts...")
+    ass_cp = loadAssinaturas()
+    print("load assinaturas...")
+    print("O autor do texto", avalia_textos(texts, ass_cp), "está infectado com COH-PIAH")
+
+'''
+def main():
+    assinatura = le_assinatura()
     texto = le_textos()
-    for i in texto:
-        sentencas = []
-        sentencas = separa_sentencas(str(i))
-        frases = []
-        num_tot_sentencas = 0
-        soma_cat_sentencas = 0
-        for i in range(len(sentencas)):
-            frase_i = separa_frases(str(sentencas[i]))
-            frases.append(frase_i)
-            num_tot_sentencas += 1
-            soma_cat_sentencas = soma_cat_sentencas + len(sentencas[i])
-        palavras = []
-        num_tot_frases = 0
-        soma_cat_frases = 0
-        for lin in range(len(frases)):
-            for col in range(len(frases[lin])):
-                palavra_i = separa_palavras(str(frases[lin][col]))
-                palavras.append(palavra_i)
-                num_tot_frases += 1
-                soma_cat_frases = soma_cat_frases + len(str(frases[lin][col]))
-        mtrx_para_lista = []
-        for lin in range(len(palavras)):
-            for col in range(len(palavras[lin])):
-                mtrx_para_lista.append(palavras[lin][col])
-        palavras = mtrx_para_lista[:]
-        soma_comp_palavras = 0
-        num_tot_palavras = 0
-        for lin in range(len(palavras)):
-            for col in range(len(palavras[lin])):
-                soma_comp_palavras = soma_comp_palavras + len(str(palavras[lin][col]))
-            num_tot_palavras += 1
+    matriz_ass = calcula_assinatura(texto)
+    assinatura = compara_assinatura(assinatura, matriz_ass)
+    copiah = avalia_textos(texto, assinatura) + 1
+    return print("O autor do texto", copiah, "está infectado com COH-PIAH.")
+'''
 
-
-
-
-
-            #lista_palavras.append(separa_frases(lista_texto[i]))
-    print(sentencas)
-    print(frases)
-    print(palavras)
-    print('Palavras Unicas: ', num_tot_palavras)
-
-
-
-    #lista_frases =
-    # =
-    #lista_pal_unicas = n_palavras_unicas(lista_palavras)
-    #lista_pal_diferentes = n_palavras_diferentes(lista_palavras)
-
-#main_teste()
-print(calcula_assinatura(le_textos()))
+main()
