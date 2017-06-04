@@ -1,3 +1,5 @@
 # Python_USP_Curso_Ciencias_da_Computacao_1
-Curso da USP no Coursera sobre Ciências da Computação usando Python
+Programs of the course "Introduction to Computer Science with Python of the University of São Paulo"
 https://www.coursera.org/learn/ciencia-computacao-python-conceitos/
+
+
